@@ -1,10 +1,20 @@
-import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import classNames from "classnames";
 import Validator from "email-validator";
 import { NavigationProp } from "@react-navigation/native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
+import { auth, db } from "../../../firebase";
 
 type RootStackParamList = {
   Home: undefined;
@@ -22,11 +32,44 @@ const Register: React.FC<RegisterNavigationProps> = ({ navigation }) => {
       .required()
       .min(6, "Password must be of atleast 6 characters"),
   });
+
+  const getRandomProfilePicture = async () => {
+    try {
+      const response = await fetch("https://randomuser.me/api");
+      const data = await response.json();
+      return data.results[0].picture.large;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const register = async (
+    email: string,
+    username: string,
+    password: string
+  ) => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password).then(
+        async (authUser) => {
+          const docRef = await addDoc(collection(db, "users"), {
+            owner_uid: authUser.user.uid,
+            username: username,
+            email: authUser.user.email,
+            // profile_picture: getRandomProfilePicture() || null,
+          });
+          console.log("Document added", docRef.id);
+        }
+      );
+    } catch (error: any) {
+      console.log(error.message);
+      Alert.alert(error.message);
+    }
+  };
   return (
     <Formik
       initialValues={{ email: "", username: "", password: "" }}
       onSubmit={(values) => {
-        console.log(values);
+        register(values.email, values.username, values.password);
       }}
       validationSchema={registerFormSchema}
       validateOnMount={true}

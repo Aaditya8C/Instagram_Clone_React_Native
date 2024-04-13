@@ -1,10 +1,19 @@
-import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import classNames from "classnames";
 import Validator from "email-validator";
 import { NavigationProp } from "@react-navigation/native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../firebase";
 
 type RootStackParamList = {
   Home: undefined;
@@ -22,11 +31,36 @@ const Login: React.FC<LoginNavigationProps> = ({ navigation }) => {
       .required()
       .min(6, "Password must be of atleast 8 characters"),
   });
+
+  const login = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password).then((res) => {
+        console.log("Firebase", email, password);
+      });
+      // await firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (error: any) {
+      console.log(error);
+      Alert.alert(
+        "Oops!!",
+        error.message + "\n\n What would you like to do next?",
+        [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+          {
+            text: "Sign Up",
+            onPress: () => navigation.navigate("Register"),
+          },
+        ]
+      );
+    }
+  };
   return (
     <Formik
       initialValues={{ email: "", password: "" }}
       onSubmit={(values) => {
-        console.log(values);
+        login(values.email, values.password);
       }}
       validationSchema={loginFormSchema}
       validateOnMount={true}
