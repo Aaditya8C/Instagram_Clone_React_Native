@@ -4,5 +4,5 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-, "Modules/components/auth/Login.tsx"  ]
+, "Modules/components/auth/Login.tsx", "Modules/fireStoreRules.js"  ]
 }

@@ -5,6 +5,7 @@ import { LogBox } from "react-native";
 import HomeScreen from "./Modules/screens/HomeScreen";
 import LoginScreen from "./Modules/screens/LoginScreen";
 import RegisterScreen from "./Modules/screens/RegisterScreen";
+import CreatePostScreen from "./Modules/screens/CreatePostScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,15 +16,32 @@ LogBox.ignoreLogs([
 const screenOptions = {
   headerShown: false,
 };
-const AppNavigation = () => {
+export const SignedInStack = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login" screenOptions={screenOptions}>
+      <Stack.Navigator
+        initialRouteName="CreatePostScreen"
+        screenOptions={screenOptions}
+      >
         <Stack.Screen
           name="Home"
           options={{ headerShown: false }}
           component={HomeScreen}
         />
+        <Stack.Screen
+          name="CreatePostScreen"
+          options={{ headerShown: false }}
+          component={CreatePostScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export const SignedOutStack = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login" screenOptions={screenOptions}>
         <Stack.Screen
           name="Login"
           options={{ headerShown: false }}
@@ -38,5 +56,3 @@ const AppNavigation = () => {
     </NavigationContainer>
   );
 };
-
-export default AppNavigation;

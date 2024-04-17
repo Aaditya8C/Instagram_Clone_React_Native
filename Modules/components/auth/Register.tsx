@@ -13,7 +13,7 @@ import classNames from "classnames";
 import Validator from "email-validator";
 import { NavigationProp } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebase";
 
 type RootStackParamList = {
@@ -33,15 +33,15 @@ const Register: React.FC<RegisterNavigationProps> = ({ navigation }) => {
       .min(6, "Password must be of atleast 6 characters"),
   });
 
-  const getRandomProfilePicture = async () => {
-    try {
-      const response = await fetch("https://randomuser.me/api");
-      const data = await response.json();
-      return data.results[0].picture.large;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getRandomProfilePicture = async () => {
+  //   try {
+  //     const response = await fetch("https://randomuser.me/api");
+  //     const data = await response.json();
+  //     return data.results[0].picture.large;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const register = async (
     email: string,
@@ -51,13 +51,13 @@ const Register: React.FC<RegisterNavigationProps> = ({ navigation }) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         async (authUser) => {
-          const docRef = await addDoc(collection(db, "users"), {
+          //adding user to firestore with email as their unique id
+          await setDoc(doc(db, "users", authUser.user.email), {
             owner_uid: authUser.user.uid,
             username: username,
             email: authUser.user.email,
             // profile_picture: getRandomProfilePicture() || null,
           });
-          console.log("Document added", docRef.id);
         }
       );
     } catch (error: any) {

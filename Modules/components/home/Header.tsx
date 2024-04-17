@@ -1,11 +1,21 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import React from "react";
 import { HeartIcon, PaperAirplaneIcon } from "react-native-heroicons/outline";
+import { FirebaseAuth } from "../../../firebase";
 
 const Header = () => {
+  const handleLogout = () => {
+    try {
+      FirebaseAuth.signOut().then(() => {
+        console.log("Signed out successfully");
+      });
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
+  };
   return (
     <View className="flex-row justify-between items-center px-2 py-3">
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleLogout}>
         <Image
           source={require("../../assets/hLogoo.png")}
           resizeMode="contain"

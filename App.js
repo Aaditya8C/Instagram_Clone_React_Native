@@ -1,6 +1,4 @@
-import HomeScreen from "./Modules/screens/HomeScreen";
-import AppNavigation from "./AppNavigation";
-
+import AuthNavigation from "./AuthNavigation";
 export default function App() {
-  return <AppNavigation />;
+  return <AuthNavigation />;
 }
