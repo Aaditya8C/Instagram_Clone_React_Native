@@ -19,10 +19,7 @@ const screenOptions = {
 export const SignedInStack = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="CreatePostScreen"
-        screenOptions={screenOptions}
-      >
+      <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
         <Stack.Screen
           name="Home"
           options={{ headerShown: false }}

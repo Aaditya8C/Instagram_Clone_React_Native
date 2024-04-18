@@ -1,6 +1,5 @@
-import { View, Text, TextInput, Image, SafeAreaView } from "react-native";
+import { View, Image, SafeAreaView } from "react-native";
 import React from "react";
-import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import { NavigationProp } from "@react-navigation/native";
 

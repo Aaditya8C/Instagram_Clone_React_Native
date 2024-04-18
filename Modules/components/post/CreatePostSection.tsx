@@ -7,21 +7,92 @@ import {
   TextInput,
   Button,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { POSTS } from "../../data/posts";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { db, FirebaseAuth } from "../../../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { NavigationProp } from "@react-navigation/native";
 
-const CreatePostSection = () => {
+type RootStackParamList = {
+  Home: undefined;
+};
+
+type CreatePostNavigationProps = {
+  navigation: NavigationProp<RootStackParamList>;
+};
+const CreatePostSection: React.FC<CreatePostNavigationProps> = ({
+  navigation,
+}) => {
   const [selectedImage, setSelectedImage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
   const uploadPostSchema = Yup.object().shape({
     imageUrl: Yup.string().url(),
     caption: Yup.string().max(700, "Max caption limit has been reached!!"),
   });
+
+  const getUserDetails = async () => {
+    const user = FirebaseAuth.currentUser;
+    const userDataSnapshot = await getDocs(
+      query(collection(db, "users"), where("owner_uid", "==", user.uid))
+    );
+
+    userDataSnapshot.docs.map((doc) => {
+      setCurrentUser({
+        username: doc.data().username,
+        profile_url: doc.data().email,
+      });
+      // console.log(doc.data());
+    });
+  };
+
+  useEffect(() => {
+    getUserDetails();
+  }, []);
+
+  const uploadPost = async (caption: string) => {
+    // getting posts reference
+    const postsCollection = collection(
+      db,
+      "users",
+      FirebaseAuth.currentUser.email,
+      "posts"
+    );
+
+    try {
+      await addDoc(postsCollection, {
+        imageUrl: selectedImage,
+        user: currentUser.username,
+        profile_picture: currentUser.profile_url,
+        owner_uid: FirebaseAuth.currentUser.uid,
+        caption: caption,
+        createdAt: serverTimestamp(),
+        likes: 0,
+        likes_by_users: [],
+        comments: [],
+      }).then(() => {
+        console.log("Post added successfully with ID: ");
+        navigation.goBack();
+      });
+    } catch (error) {
+      console.error("Error adding post: ", error);
+    }
+  };
+
   return (
     <Formik
-      initialValues={{ caption: "", imageUrl: "" }}
-      onSubmit={(values) => console.log(values)}
+      initialValues={{ caption: "" }}
+      onSubmit={(values) => uploadPost(values.caption)}
       validationSchema={uploadPostSchema}
       validateOnMount={true}
     >

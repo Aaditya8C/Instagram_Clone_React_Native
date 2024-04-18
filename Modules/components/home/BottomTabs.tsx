@@ -7,8 +7,18 @@ import {
   PlusCircleIcon,
 } from "react-native-heroicons/outline";
 import { USERS } from "../../data/users";
+import { NavigationProp } from "@react-navigation/native";
 
-const BottomTabs = () => {
+type RootStackParamList = {
+  Home: undefined;
+  Register: undefined;
+  CreatePostScreen: undefined;
+};
+
+type HomeNavigationProps = {
+  navigation: NavigationProp<RootStackParamList>;
+};
+const BottomTabs: React.FC<HomeNavigationProps> = ({ navigation }) => {
   const iconData = [
     {
       icon: <HomeIcon size={28} color="white" />,
@@ -31,7 +41,14 @@ const BottomTabs = () => {
   return (
     <View className="flex-row justify-between px-4 items-center pt-2 -mb-7">
       {iconData.map(({ icon, key }) => (
-        <TouchableOpacity key={key}>{icon}</TouchableOpacity>
+        <TouchableOpacity
+          key={key}
+          onPress={() =>
+            key == "addPost" && navigation.navigate("CreatePostScreen")
+          }
+        >
+          {icon}
+        </TouchableOpacity>
       ))}
     </View>
   );
